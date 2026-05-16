@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /tmp/vidframes)",
+      "Bash(ffmpeg -y -i \"C:/Users/mobol/Downloads/457a1aa898b14475b907cbc86429948d.mp4\" -vf \"fps=1\" /tmp/vidframes/frame_%03d.png)"
+    ]
+  }
+}
