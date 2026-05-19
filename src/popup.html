@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project Manager Finder</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <p class="eyebrow">LinkedIn assistant</p>
+        <h1>Project Manager Finder</h1>
+        <p class="hero-copy">
+          Build searches, save profiles, draft outreach, and review every message before you send it.
+        </p>
+      </header>
+
+      <section class="notice" aria-label="Responsible use notice">
+        <strong>Manual-send workflow:</strong>
+        This extension never logs in for you, scrapes LinkedIn, or clicks Send. You stay in control.
+      </section>
+
+      <section class="card" aria-labelledby="search-title">
+        <div class="section-heading">
+          <h2 id="search-title">1. Build a search</h2>
+          <span class="pill">opens new tab</span>
+        </div>
+
+        <label>
+          Role
+          <input id="roleInput" type="text" value="Project Manager" autocomplete="off">
+        </label>
+
+        <label>
+          Location
+          <input id="locationInput" type="text" placeholder="Example: London, United Kingdom" autocomplete="off">
+        </label>
+
+        <label>
+          Industry
+          <input id="industryInput" type="text" placeholder="Example: construction, fintech, healthcare" autocomplete="off">
+        </label>
+
+        <label>
+          Extra keywords
+          <input id="keywordInput" type="text" placeholder="Example: PMP, agile, remote" autocomplete="off">
+        </label>
+
+        <p id="queryPreview" class="query-preview"></p>
+
+        <div class="button-row">
+          <button id="openLinkedInSearchButton" type="button">Open LinkedIn search</button>
+          <button id="openGoogleSearchButton" class="secondary" type="button">Open Google search</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="lead-title">
+        <div class="section-heading">
+          <h2 id="lead-title">2. Save a lead</h2>
+          <span class="pill">current tab</span>
+        </div>
+
+        <div class="button-row">
+          <button id="loadCurrentProfileButton" type="button">Load current LinkedIn profile</button>
+        </div>
+
+        <label>
+          Name
+          <input id="leadNameInput" type="text" placeholder="Lead name" autocomplete="off">
+        </label>
+
+        <label>
+          Title or headline
+          <input id="leadTitleInput" type="text" placeholder="Project manager at..." autocomplete="off">
+        </label>
+
+        <label>
+          LinkedIn profile URL
+          <input id="leadUrlInput" type="url" placeholder="https://www.linkedin.com/in/..." autocomplete="off">
+        </label>
+
+        <label>
+          Notes
+          <textarea id="leadNotesInput" rows="3" placeholder="Why this person looks relevant"></textarea>
+        </label>
+
+        <label>
+          Status
+          <select id="leadStatusInput">
+            <option>Saved</option>
+            <option>Drafted</option>
+            <option>Messaged</option>
+            <option>Replied</option>
+            <option>Follow-up</option>
+            <option>Closed</option>
+          </select>
+        </label>
+
+        <div class="button-row">
+          <button id="saveLeadButton" type="button">Save lead</button>
+          <button id="resetLeadFormButton" class="secondary" type="button">Clear form</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="draft-title">
+        <div class="section-heading">
+          <h2 id="draft-title">3. Draft a message</h2>
+          <span class="pill">copy only</span>
+        </div>
+
+        <label>
+          Choose saved lead
+          <select id="draftLeadSelect">
+            <option value="">Select a lead</option>
+          </select>
+        </label>
+
+        <label>
+          Your goal
+          <input id="outreachGoalInput" type="text" placeholder="Example: discuss a project opportunity" autocomplete="off">
+        </label>
+
+        <label>
+          Message draft
+          <textarea id="messageDraftInput" rows="6" placeholder="Select a lead or save one first"></textarea>
+        </label>
+
+        <div class="button-row">
+          <button id="generateDraftButton" type="button">Generate draft</button>
+          <button id="copyDraftButton" class="secondary" type="button">Copy draft</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="saved-title">
+        <div class="section-heading">
+          <h2 id="saved-title">Saved leads</h2>
+          <button id="exportCsvButton" class="text-button" type="button">Export CSV</button>
+        </div>
+
+        <label>
+          Filter leads
+          <input id="leadFilterInput" type="search" placeholder="Search saved names, titles, notes" autocomplete="off">
+        </label>
+
+        <div id="leadList" class="lead-list" aria-live="polite"></div>
+      </section>
+
+      <p id="statusMessage" class="status-message" role="status"></p>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

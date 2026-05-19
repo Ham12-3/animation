@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "LinkedIn Project Manager Finder",
+  "version": "0.1.0",
+  "description": "A user-approved assistant for finding project managers, saving leads, and drafting LinkedIn outreach.",
+  "permissions": ["activeTab", "clipboardWrite", "storage", "tabs"],
+  "host_permissions": ["https://www.linkedin.com/*"],
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_title": "Project Manager Finder"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/in/*"],
+      "js": ["src/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
