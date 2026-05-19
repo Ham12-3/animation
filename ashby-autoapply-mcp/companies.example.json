@@ -1,0 +1,20 @@
+{
+  "_notes": "Ashby has NO global job search. List the Ashby board slugs you care about here. The slug is the path in jobs.ashbyhq.com/<slug> and is case-sensitive. The starter slugs below are companies commonly known to use Ashby but are NOT guaranteed correct - run the verify_companies tool after editing, then delete the invalid ones and add your own.",
+  "companies": [
+    "ramp",
+    "linear",
+    "notion",
+    "vanta",
+    "posthog",
+    "replit",
+    "hex",
+    "modal",
+    "watershed",
+    "baseten",
+    "mux",
+    "render",
+    "census",
+    "tigris",
+    "runway"
+  ]
+}

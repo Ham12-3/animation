@@ -1,0 +1,13 @@
+# Your real data — never commit these
+recipients.csv
+sent_log.csv
+.linkedin-bot-chrome/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+build/
+dist/

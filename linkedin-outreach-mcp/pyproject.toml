@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "linkedin-outreach-mcp"
+version = "0.1.0"
+description = "MCP server that drives your own logged-in Chrome to do LinkedIn outreach (search, DM, noted connection requests) with a human in the loop."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.2",
+    "playwright>=1.44",
+]
+
+[project.scripts]
+linkedin-outreach-mcp = "linkedin_outreach_mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/linkedin_outreach_mcp"]
