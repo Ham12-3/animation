@@ -1,0 +1,28 @@
+{
+  "full_name": "Abdulhamid Sonaike",
+  "email": "FILL_ME@example.com",
+  "phone": "FILL_ME (+44...)",
+  "location": "FILL_ME (e.g. London, United Kingdom)",
+  "linkedin": "https://www.linkedin.com/in/abdulhamid-sonaike",
+  "github": "",
+  "website": "",
+  "resume_path": "/ABSOLUTE/PATH/TO/your-cv.pdf",
+
+  "target_titles": ["Software Engineer", "Backend Engineer", "Full Stack Engineer"],
+  "keywords": ["python", "typescript", "react", "node"],
+  "locations": ["London", "United Kingdom", "Remote"],
+  "remote_only": false,
+
+  "default_answers": {
+    "work authorization": "FILL_ME (e.g. Yes, authorized to work in the UK)",
+    "require sponsorship": "FILL_ME (e.g. No / Yes)",
+    "willing to relocate": "FILL_ME",
+    "notice period": "FILL_ME (e.g. 1 month)",
+    "earliest start date": "",
+    "salary expectation": ""
+  },
+
+  "self_identification": "decline",
+
+  "_notes": "Copy this to ~/.ashby-mcp/profile.json and fill every FILL_ME. target_titles/keywords/locations drive job discovery; the top fields + default_answers fill application forms. The server never guesses unknown questions - it asks you."
+}

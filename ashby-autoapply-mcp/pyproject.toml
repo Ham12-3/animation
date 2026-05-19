@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ashby-autoapply-mcp"
+version = "0.1.0"
+description = "MCP server that discovers jobs from Ashby company boards (public posting API) and auto-applies in your own logged-in Chrome, with a profile.json you control."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.2",
+    "playwright>=1.44",
+]
+
+[project.scripts]
+ashby-autoapply-mcp = "ashby_autoapply_mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ashby_autoapply_mcp"]
