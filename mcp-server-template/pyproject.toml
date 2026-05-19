@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-server-template"
+version = "0.1.0"
+description = "Copy-and-rename starter for a new MCP server."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.2",
+]
+
+[project.scripts]
+mcp-server-template = "mcp_server_template.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_server_template"]
