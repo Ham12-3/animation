@@ -13,11 +13,24 @@ debugged Chrome instance, so one Chrome window can be driven by every server.
 Each server has its own README with full setup + the tools it exposes. What
 follows is the cross-cutting "wire it all up once" guide.
 
+## TL;DR
+
+```bash
+make setup                          # install everything + Playwright driver
+make claude-config                  # prints the Claude Desktop block (see step 4)
+make new-server NAME=your-thing     # later: scaffold a new MCP server
+make test                           # sanity-check every server
+```
+
+Run `make help` to see every target.
+
 ## 1. Install everything
 
 ```bash
-pip install -e ./linkedin-outreach-mcp ./ashby-autoapply-mcp
-python -m playwright install        # one-time, pulls Playwright's browser driver
+make setup
+# equivalent to:
+#   pip install -e ./linkedin-outreach-mcp -e ./ashby-autoapply-mcp
+#   python -m playwright install
 ```
 
 This puts both console scripts (`linkedin-outreach-mcp` and
@@ -100,9 +113,14 @@ server's README has example prompts.
 
 ## 5. Adding a new MCP server
 
-Use [`mcp-server-template/`](mcp-server-template/). Copy it, rename, edit
-`server.py`, then add a block to the `mcpServers` object above. Step-by-step
-in the template's README.
+```bash
+make new-server NAME=your-thing
+```
+
+Scaffolds `your-thing-mcp/` from [`mcp-server-template/`](mcp-server-template/),
+renames the package, pip-installs it, and prints the Claude Desktop config
+block to paste. Then edit `your-thing-mcp/src/your_thing_mcp/server.py` and
+go. Manual steps are in the template's README if you'd rather copy by hand.
 
 ## Honest reminders
 
