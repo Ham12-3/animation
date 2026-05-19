@@ -568,5 +568,10 @@ async def activity_log(limit: int = 20) -> dict[str, Any]:
             "recent": rows[-max(1, min(limit, 200)):]}
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Console entry point: run the server over stdio (for MCP clients)."""
     mcp.run()
+
+
+if __name__ == "__main__":
+    main()
