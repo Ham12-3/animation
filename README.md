@@ -1,111 +1,156 @@
-# LinkedIn messaging via your own Chrome
+# LinkedIn outreach for Claude (MCP server)
 
-A small tool that attaches to **your already-open, already-logged-in Chrome**
-and sends LinkedIn messages from a list — with a human in the loop.
+Talk to Claude in plain language — *"find fintech product managers in London
+and send them a short intro from me"* — and Claude drives **your own
+already-open, already-logged-in Chrome** to search LinkedIn, message people
+you're connected to, or send a connection request with a personalized note to
+people you're not. Claude asks you before anything is sent, and asks
+questions whenever something is unclear instead of guessing.
 
-It does **not** log in for you, does **not** ask for or store your password,
-and does **not** launch a hidden browser. You drive a real Chrome window; the
-script just automates the clicks while you watch.
+There are two pieces in this repo:
+
+| File | What it is |
+|---|---|
+| `linkedin_mcp_server.py` | **The MCP server** — the thing you want. Connects to Claude. |
+| `linkedin_bot.py` | Optional standalone CSV script (older, manual-list approach). |
+
+It never sees or stores your password. You launch Chrome with remote
+debugging and log into LinkedIn by hand; the server attaches over the Chrome
+DevTools Protocol and drives that visible window. You watch it happen.
 
 ## Read this first
 
-LinkedIn's User Agreement prohibits automated messaging and scraping.
-Using this can get your account **rate-limited, restricted, or permanently
-banned**, regardless of how careful you are. You accept that risk.
+Automating LinkedIn violates LinkedIn's User Agreement and can get your
+account **rate-limited, restricted, or permanently banned**. You accept that
+risk. Also, on **free** LinkedIn accounts the number of connection requests
+that can include a personalized note is heavily limited (Premium gets more),
+and there are weekly invite caps. The server surfaces LinkedIn's own limit
+messages back to Claude so it can tell you, rather than failing silently.
 
-To keep risk low:
-
-- Keep the daily cap small (default 20; honestly, lower is safer).
-- Write personal messages — generic blasts are what gets flagged.
-- Stay at the keyboard and watch it run. Use the default per-message
-  confirmation, not `--yes`.
-- Only message people you actually have a reason to message.
-
-This is for your own account and your own outreach. Don't use it to spam.
+Keep volume low, keep messages genuinely personal, watch it run.
 
 ## Setup
 
 ```bash
 pip install -r requirements.txt
-python -m playwright install   # one-time; pulls Playwright's driver
+python -m playwright install        # one-time
 ```
 
 ## 1. Start Chrome with remote debugging
 
-Quit Chrome completely first, then launch it with a debugging port and a
-dedicated profile folder (so it doesn't disturb your normal profile):
+Quit Chrome completely, then launch it with a debug port and a dedicated
+profile folder (so your normal profile is untouched):
 
-**macOS**
 ```bash
+# macOS
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-  --remote-debugging-port=9222 \
-  --user-data-dir="$HOME/.linkedin-bot-chrome"
-```
+  --remote-debugging-port=9222 --user-data-dir="$HOME/.linkedin-bot-chrome"
 
-**Linux**
-```bash
+# Linux
 google-chrome --remote-debugging-port=9222 \
   --user-data-dir="$HOME/.linkedin-bot-chrome"
 ```
-
-**Windows (PowerShell)**
 ```powershell
+# Windows PowerShell
 & "C:\Program Files\Google\Chrome\Application\chrome.exe" `
-  --remote-debugging-port=9222 `
-  --user-data-dir="$env:USERPROFILE\.linkedin-bot-chrome"
+  --remote-debugging-port=9222 --user-data-dir="$env:USERPROFILE\.linkedin-bot-chrome"
 ```
 
-In that Chrome window, go to linkedin.com and **log in normally** (including
-any 2FA). The session stays in that profile folder, so you only do this once.
+In that window, go to linkedin.com and **log in by hand** (including 2FA).
+The session persists in that profile folder, so this is a one-time thing.
 
-## 2. Build your recipient list
+## 2. Connect the server to Claude Desktop
 
-Copy `recipients.example.csv` to `recipients.csv` and edit it. Columns:
+Edit Claude Desktop's config file:
 
-- `profile_url` (required) — the person's LinkedIn profile URL.
-- `first_name` (optional) — used for the `{first_name}` placeholder.
-- `message` (optional) — per-person message. If blank, the `--message`
-  template is used.
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
-## 3. Dry-run (default, sends nothing)
-
-```bash
-python linkedin_bot.py --recipients recipients.csv
+```jsonc
+{
+  "mcpServers": {
+    "linkedin-outreach": {
+      "command": "python",
+      "args": ["/ABSOLUTE/PATH/TO/linkedin_mcp_server.py"],
+      "env": {
+        "LINKEDIN_MCP_CDP_URL": "http://127.0.0.1:9222",
+        "LINKEDIN_MCP_DAILY_MSG_CAP": "25",
+        "LINKEDIN_MCP_WEEKLY_INVITE_CAP": "80"
+      }
+    }
+  }
+}
 ```
 
-This prints exactly what it *would* send for each person and writes a
-`dry-run` row to `sent_log.csv`. Nothing is sent.
+Use the absolute path to `python` from where you installed the requirements
+(e.g. a venv's `python`). Restart Claude Desktop. Any other MCP-capable app
+works the same way — point it at `python linkedin_mcp_server.py` over stdio.
 
-## 4. Send, confirming each one
+## 3. Just talk to Claude
 
-```bash
-python linkedin_bot.py --recipients recipients.csv --send
-```
+> "Check LinkedIn is ready. Then find 10 heads of growth at Series B fintechs
+> in the UK. For each, if I'm connected send: *'Hi {name} — really liked your
+> take on activation; would love to compare notes sometime.'* If I'm not
+> connected, send a connection request with a one-line version of that. Show
+> me each one before sending and ask me if anything's unclear."
 
-For each person it opens the profile, opens the message box, types the
-message, and asks `Send this message? [y/N]` before clicking Send. It waits
-a randomized delay between sends and stops at the daily cap.
+What Claude does with the tools:
 
-### Options
+1. `linkedin_status` — confirms Chrome is attached and you're logged in.
+2. `search_people` — runs the search, shows you the matches. You pick.
+3. `reach_out` (preview) — for each person it reports whether it will **DM**
+   (you're connected) or send a **connection request + note** (you're not),
+   and the exact text. **Nothing is sent yet.**
+4. You approve → Claude calls `reach_out` again with `confirm=true`.
+5. `activity_log` — anytime, to see what was done and caps remaining.
 
-| Flag | Default | Meaning |
+## How the safety model works
+
+- **Two-step send.** Every `reach_out` with `confirm=false` does nothing and
+  returns a preview. Sending requires a second, explicit `confirm=true` call.
+  Claude is instructed to show you the preview and get your approval first.
+- **It asks instead of guessing.** If a page is a login/captcha wall, the
+  layout is unrecognized, or it can't tell whether to message vs connect, the
+  tool returns `needs_user_input`/`ambiguous` and Claude asks you a question.
+- **Caps + audit log.** Daily message cap and weekly invite cap (env-tunable)
+  are enforced from `~/.linkedin-mcp/activity_log.csv`, which records every
+  action with a timestamp.
+- **Note length.** Connection notes over 300 chars are rejected so Claude
+  shortens them rather than having LinkedIn truncate.
+
+### Tunable env vars
+
+| Var | Default | Meaning |
 |---|---|---|
-| `--cdp-url` | `http://localhost:9222` | Where your debug Chrome is listening |
-| `--recipients` | `recipients.csv` | Input CSV |
-| `--message` | `Hi {first_name}, great to connect on LinkedIn!` | Fallback template |
-| `--send` | off | Actually send (otherwise dry-run) |
-| `--yes` | off | Skip the per-message prompt (auto-send — higher risk) |
-| `--daily-cap` | `20` | Max real sends per calendar day |
-| `--min-delay` / `--max-delay` | `45` / `90` | Seconds to wait after each send |
-| `--log` | `sent_log.csv` | Append-only audit log |
+| `LINKEDIN_MCP_CDP_URL` | `http://127.0.0.1:9222` | Your debug Chrome endpoint |
+| `LINKEDIN_MCP_DAILY_MSG_CAP` | `25` | Max DMs sent per day |
+| `LINKEDIN_MCP_WEEKLY_INVITE_CAP` | `80` | Max connection invites per 7 days |
+| `LINKEDIN_MCP_MIN_DELAY` / `_MAX_DELAY` | `6` / `16` | Seconds to wait after a send |
+| `LINKEDIN_MCP_LOG` | `~/.linkedin-mcp/activity_log.csv` | Audit log path |
 
-## Notes & limits
+## Honest limitations
 
-- The daily cap is enforced from `sent_log.csv`, so keep that file around.
-- LinkedIn changes its HTML often. If the Message box or Send button stops
-  being found, the selectors in `linkedin_bot.py` (`open_message_box`,
-  `click_send`) are where to adjust.
-- People you aren't connected to may not show a Message button; those are
-  logged as `skipped`.
-- This was built to run on your machine; it can't be tested in a headless
-  CI/cloud environment because it needs your real Chrome and LinkedIn session.
+- LinkedIn changes its HTML constantly. Search-result parsing and the
+  Connect/Message/Send selectors (`_profile_state`, `_send_dm`,
+  `_send_invite`, `search_people` in `linkedin_mcp_server.py`) are the fragile
+  parts and may need occasional tweaks. The server fails loudly (asks you)
+  rather than doing the wrong thing.
+- This was built to run on your machine with your real Chrome and LinkedIn
+  session. It cannot be exercised end-to-end in a headless/cloud environment,
+  so the browser-driving paths are unverified against live LinkedIn — watch
+  the first real run closely.
+- Free-account invite-note limits and LinkedIn's commercial-use search limit
+  are LinkedIn-side; the server reports them but cannot bypass them.
+
+---
+
+### Optional: standalone CSV script (`linkedin_bot.py`)
+
+If you ever want a no-AI, fixed-list run instead: dry-runs by default, and
+`--send` prompts per message. See `recipients.example.csv`. This is the older
+approach you said you didn't want — kept only as a fallback.
+
+```bash
+python linkedin_bot.py --recipients recipients.csv          # preview only
+python linkedin_bot.py --recipients recipients.csv --send    # confirm each
+```
