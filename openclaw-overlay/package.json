@@ -1,0 +1,24 @@
+{
+  "name": "openclaw-overlay",
+  "version": "1.0.0",
+  "description": "Remotion illustration overlays for the OpenClaw explainer video",
+  "remotion": {
+    "entryPoint": "./src/index.ts"
+  },
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts OpenClawOverlay out/openclaw_overlay.mp4",
+    "render:png": "remotion still src/index.ts OpenClawOverlay --frame=0 out/preview.png"
+  },
+  "dependencies": {
+    "@remotion/player": "4.0.290",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.290"
+  },
+  "devDependencies": {
+    "@remotion/cli": "4.0.290",
+    "@types/react": "^18.3.29",
+    "typescript": "^5.9.3"
+  }
+}
