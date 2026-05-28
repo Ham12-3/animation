@@ -1,8 +1,8 @@
 import React from "react";
-import { interpolate, useCurrentFrame, spring, useVideoConfig, Img } from "remotion";
+import { interpolate, useCurrentFrame, spring, useVideoConfig, Img, staticFile } from "remotion";
 
-const CLAUDE_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Claude_AI_logo.svg/960px-Claude_AI_logo.svg.png";
-const OPENAI_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/OpenAI_Logo.svg/960px-OpenAI_Logo.svg.png";
+const CLAUDE_URL = staticFile("claude.svg");
+const OPENAI_URL = staticFile("openai.svg");
 
 export const LLMConnect: React.FC = () => {
   const frame = useCurrentFrame();

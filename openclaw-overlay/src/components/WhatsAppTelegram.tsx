@@ -1,8 +1,8 @@
 import React from "react";
-import { interpolate, useCurrentFrame, spring, useVideoConfig, Img } from "remotion";
+import { interpolate, useCurrentFrame, spring, useVideoConfig, Img, staticFile } from "remotion";
 
-const WA_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/WhatsApp_Logo_green.svg/500px-WhatsApp_Logo_green.svg.png";
-const TG_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Telegram_2019_Logo.svg/960px-Telegram_2019_Logo.svg.png";
+const WA_URL = staticFile("whatsapp.svg");
+const TG_URL = staticFile("telegram.svg");
 
 export const WhatsAppTelegram: React.FC = () => {
   const frame = useCurrentFrame();
